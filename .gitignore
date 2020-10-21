@@ -1,0 +1,18 @@
+# Maven built artifacts
+target
+
+# README.adoc conversor
+build*
+
+# Local installed Keycloak
+/keycloak*
+
+# Generated Logs
+*.log
+
+# Generated Tokens
+*.token
+
+# IntelliJ Idea
+*.iml
+.idea

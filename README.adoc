@@ -1,0 +1,92 @@
+= Keycloak Robot Integration Demo
+Paulo Jerônimo <paulojeronimo@gmail.com>, {localdatetime}
+:toc: left
+:icons: font
+:nofooter:
+:idprefix:
+:idseparator: -
+:sectanchors:
+
+:RoboHelper: https://paulojeronimo.com/keycloak-robot-integration/#o-robo-helper["RobôHelper"^]
+
+== Introduction
+
+This is a demo implementation for {RoboHelper}.
+This code was tested with Keycloak versions 11.0.2 and 4.8.3.Final.
+
+NOTE: The link above points to a text written in Brazilian Portuguese.
+
+== Software requirements
+
+. Bash 5
+. For Keycloak 4.8.3.Final:
+.. JDK 8
+. For Keycloak 11.0.2.Final:
+.. JDK 11
+. wget
+. mvn
+. jq
+
+== Steps to run this demo
+
+Clone this repo and `cd` to it:
+
+----
+$ git clone https://github.com/paulojeronimo/keycloak-robot-helper-demo
+$ cd `basename $_`
+----
+
+Load some functions into your current shell:
+
+----
+$ source functions.sh
+----
+
+Download and install Keycloak:
+
+----
+$ roh-kc-install
+----
+
+[NOTE]
+====
+* "roh" is a short for (**Ro**bot **H**elper).
+* "kc" is a short for (**K**ey**c**loak).
+====
+
+Start Keycloak and watch its logs:
+
+----
+$ roh-kc-start
+$ roh-kc-log &
+----
+
+Configure Keycloak:
+
+----
+$ roh-kc-configure
+----
+
+Build and deploy the Robot Helper extension:
+
+----
+$ roh-deploy
+----
+
+Test the extension:
+
+----
+$ roh-delete-generated-tokens
+$ roh-test-create-user
+----
+
+[NOTE]
+====
+You can see details about the generated `access_token` for the configured
+service account by typing:
+
+----
+$ cat service-account-ivr.access.token
+$ roh-jwt $_
+----
+====

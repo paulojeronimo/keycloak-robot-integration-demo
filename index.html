@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.10">
-<meta name="author" content="Paulo Jerônimo &lt;paulojeronimo@gmail.com&gt;, 2020-10-21 11:46:28 -0300">
+<meta name="author" content="Paulo Jerônimo &lt;paulojeronimo@gmail.com&gt;, 2020-10-21 16:40:36 -0300">
 <title>Keycloak Robot Integration Demo</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -442,7 +442,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="header">
 <h1>Keycloak Robot Integration Demo</h1>
 <div class="details">
-<span id="author" class="author">Paulo Jerônimo &lt;paulojeronimo@gmail.com&gt;, 2020-10-21 11:46:28 -0300</span><br>
+<span id="author" class="author">Paulo Jerônimo &lt;paulojeronimo@gmail.com&gt;, 2020-10-21 16:40:36 -0300</span><br>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -572,6 +572,26 @@ $ cd `basename $_`</pre>
 <div class="content">
 <pre>$ roh-kc-start
 $ roh-kc-log &amp;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Increase the log level for some log categories in Keyclock.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+This will be help you to debug the code in this project.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ roh-kc-increase-log-level</pre>
 </div>
 </div>
 <div class="paragraph">

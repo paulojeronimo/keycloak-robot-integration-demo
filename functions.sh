@@ -25,6 +25,7 @@ CLIENT1_ID=ivr
 CLIENT1_SECRET=06b3bef0-37a0-4d2d-9e24-198589d41eec
 CLIENT1_SERVICE_ACCOUNT=service-account-$CLIENT1_ID
 CLIENT2_ID=$CLIENT1_ID-web
+CURL_RESPONSE=$ROH_DIR/curl.response.txt
 CURL_LOG=$ROH_DIR/curl.log
 
 export PATH="$ROH_DIR/keycloak/bin:$PATH"
@@ -35,6 +36,14 @@ roh-jwt() {
 		| if has("iat")       then .iat       |= todate else . end
 		| if has("nbf")       then .nbf       |= todate else . end
 		| if has("auth_time") then .auth_time |= todate else . end' "$@"
+}
+
+roh-h2-console() {
+	set -x
+	jar="./modules/system/layers/base/com/h2database/h2/main/h2-*.jar"
+	url="jdbc:h2:./standalone/data/keycloak;AUTO_SERVER=TRUE"
+	(cd "$ROH_DIR/keycloak"; java -cp $jar org.h2.tools.Console -url "$url" -user sa -password sa)
+	set +x
 }
 
 roh-kc-install() {
@@ -66,6 +75,32 @@ roh-kc-start() {
 
 roh-kc-log() {
 	tail -f "$ROH_DIR"/keycloak/standalone/log/server.log
+}
+
+roh-kc-increase-log-level() {
+	jboss-cli.sh --connect <<-EOF
+	batch
+	/subsystem=logging/logger=org.keycloak/:add(category=org.keycloak,level=TRACE)
+	/subsystem=logging/logger=org.keycloak.transaction/:add(category=org.keycloak.transaction,level=INFO)
+	/subsystem=logging/logger=org.keycloak.services.scheduled/:add(category=org.keycloak.services.scheduled,level=INFO)
+	/subsystem=logging/logger=org.keycloak.models.sessions.infinispan/:add(category=org.keycloak.models.sessions.infinispan,level=INFO)
+	/subsystem=logging/logger=org.keycloak.connections.jpa/:add(category=org.keycloak.connections.jpa,level=DEBUG)
+	/subsystem=logging/logger=com.paulojeronimo/:add(category=com.paulojeronimo,level=TRACE)
+	run-batch
+	EOF
+}
+
+roh-kc-reset-log-level() {
+	jboss-cli.sh --connect <<-EOF
+	batch
+	/subsystem=logging/logger=org.keycloak:remove
+	/subsystem=logging/logger=org.keycloak.transaction:remove
+	/subsystem=logging/logger=org.keycloak.services.scheduled:remove
+	/subsystem=logging/logger=org.keycloak.models.sessions.infinispan:remove
+	/subsystem=logging/logger=org.keycloak.connections.jpa:remove
+	/subsystem=logging/logger=com.paulojeronimo:remove
+	run-batch
+	EOF
 }
 
 roh-kc-configure() {
@@ -114,6 +149,27 @@ __roh-print-ok-or-failed() {
 	}
 }
 
+__roh-curl() {
+	curl -s -o $CURL_RESPONSE -w "%{http_code}" "$@"
+}
+
+__roh-print-ok-or-failed-2() {
+	local last_status=$?
+	local response_code=$1
+	local expected=$2
+	[ $last_status = 0 ] && {
+		[ $response_code = $expected ] && {
+			echo "Ok! The expected code was $expected."
+		} || {
+			echo "Failed! Responde code ($response_code) wasn't the expected ($expected)."
+			return 1
+		}
+	} || {
+		echo -e "Curl failed! Details:\n$(cat $CURL_LOG)"
+		return $last_status
+	}
+}
+
 __roh-service-account-access_token() {
 	local file=$ROH_DIR/$CLIENT1_SERVICE_ACCOUNT.access.token
 	[ -f "$file" ] && {
@@ -136,28 +192,28 @@ __roh-create-user() {
 	local user=$2
 	local password=$3
 	local endpoint="$CLIENT1_ID/create-user"
-	local result
+	local response_code
 	echo -n "Creating user \"$user\" with \"$password\" by calling endpoint \"$endpoint\" ... "
-	result=$(curl -X POST "$KC_AUTH_URL/realms/$REALM/$endpoint" \
+	response_code=$(__roh-curl -X POST "$KC_AUTH_URL/realms/$REALM/$endpoint" \
 		-H 'Content-Type: application/x-www-form-urlencoded' \
 		-H "Authorization: Bearer $access_token" \
 		-d "username=$user" \
 		-d "password=$password" 2> "$CURL_LOG")
-	__roh-print-ok-or-failed || return $?
+	__roh-print-ok-or-failed-2 $response_code 200 || return $?
 	echo "Result:"
-	jq . <<< $result
+	cat $CURL_RESPONSE | jq .
 }
 
 __roh-login-on-client2-as-user() {
 	local user=$1
 	local password=$2
-	local result
+	local response_code
 	echo -n "Trying to login on \"$CLIENT2_ID\" with user \"$user\" and password \"$password\" ... "
-	result=$(curl -X POST "$KC_AUTH_URL/realms/$REALM/protocol/openid-connect/token" \
+	response_code=$(__roh-curl -X POST "$KC_AUTH_URL/realms/$REALM/protocol/openid-connect/token" \
 		-H 'Content-Type: application/x-www-form-urlencoded' \
 		-d "grant_type=password&client_id=$CLIENT2_ID&username=$user&password=$password" \
 		2> "$CURL_LOG")
-	__roh-print-ok-or-failed || return $?
+	__roh-print-ok-or-failed-2 $response_code 200 || return $?
 	echo $result > "$ROH_DIR"/$user.access.token
 }
 
@@ -175,5 +231,5 @@ __roh-create-and-login() {
 roh-test-create-user() {
 	__roh-service-account-access_token || return $?
 	local id
-	for id in {2..9}; do __roh-create-and-login user$id password$id; done
+	for id in {2..4}; do __roh-create-and-login user$id password$id; done
 }

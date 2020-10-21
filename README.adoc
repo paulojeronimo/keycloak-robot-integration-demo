@@ -61,6 +61,14 @@ $ roh-kc-start
 $ roh-kc-log &
 ----
 
+Increase the log level for some log categories in Keyclock.
+
+NOTE: This will be help you to debug the code in this project.
+
+----
+$ roh-kc-increase-log-level
+----
+
 Configure Keycloak:
 
 ----

@@ -1,4 +1,4 @@
-package com.paulojeronimo.robothelper;
+package com.paulojeronimo.robothelper.services.resource;
 
 import org.keycloak.Config;
 import org.keycloak.models.KeycloakSession;

@@ -1,10 +1,12 @@
-package org.keycloak.models.credential.org.keycloak.models;
+package com.paulojeronimo.robothelper.models;
 
+import com.paulojeronimo.robothelper.models.credential.IvrPasswordUserCredentialModel;
 import org.keycloak.models.UserCredentialModel;
-import org.keycloak.models.credential.IvrPasswordUserCredentialModel;
 
 public class IvrUserCredentialModel extends UserCredentialModel {
     public static final String IVR_PASSWORD = "password";
+    public static final String IVR_PASSWORD_HISTORY = "ivr-passwor-history";
+
     public static IvrPasswordUserCredentialModel password(String password) {
         return password(password, false);
     }

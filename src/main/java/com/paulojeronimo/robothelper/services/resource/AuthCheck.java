@@ -1,4 +1,4 @@
-package com.paulojeronimo.robothelper;
+package com.paulojeronimo.robothelper.services.resource;
 
 import org.jboss.logging.Logger;
 import org.keycloak.models.ClientModel;
@@ -6,7 +6,6 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RoleModel;
 import org.keycloak.representations.AccessToken;
 import org.keycloak.services.managers.AppAuthManager;
-import org.keycloak.services.managers.Auth;
 import org.keycloak.services.managers.AuthenticationManager;
 
 import javax.ws.rs.ForbiddenException;

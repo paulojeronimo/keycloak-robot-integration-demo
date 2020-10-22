@@ -1,8 +1,8 @@
-package com.paulojeronimo.robothelper;
+package com.paulojeronimo.robothelper.services.resource;
 
 import org.jboss.logging.Logger;
 import org.keycloak.models.*;
-import org.keycloak.models.credential.org.keycloak.models.IvrUserCredentialModel;
+import com.paulojeronimo.robothelper.models.IvrUserCredentialModel;
 import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.services.resource.RealmResourceProvider;
 

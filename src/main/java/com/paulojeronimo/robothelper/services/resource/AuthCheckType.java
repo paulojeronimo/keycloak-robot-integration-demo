@@ -1,4 +1,4 @@
-package com.paulojeronimo.robothelper;
+package com.paulojeronimo.robothelper.services.resource;
 
 public enum AuthCheckType {
     ANONYMOUS,
